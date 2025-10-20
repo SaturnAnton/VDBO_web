@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: demucs-audio-mixer
+    env: python
+    region: oregon  # puoi cambiarlo
+    plan: free
+    buildCommand: |
+      apt-get update && apt-get install -y ffmpeg
+      pip install -r requirements.txt
+    startCommand: |
+      gunicorn app:app --timeout 1200 --workers 1 --threads 2 --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PORT
+        value: 5000
