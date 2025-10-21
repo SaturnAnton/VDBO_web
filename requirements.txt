@@ -14,7 +14,7 @@ yt-dlp==2024.12.13
 # Utility
 requests==2.31.0
 numpy==2.0.0
-scipy==2.0.0
+scipy==1.13.1
 pydub==0.25.1
 
 # Logging and progress
