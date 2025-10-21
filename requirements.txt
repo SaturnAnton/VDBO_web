@@ -6,7 +6,7 @@ gunicorn==23.0.0
 demucs==4.0.1
 torch==2.9.0
 torchaudio==2.9.0
-ffmpeg-python==0.2.1
+ffmpeg-python==0.2.0
 
 # YouTube download
 yt-dlp==2024.12.13
