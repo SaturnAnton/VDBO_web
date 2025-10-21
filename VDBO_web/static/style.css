@@ -1,0 +1,139 @@
+body {
+    font-family: "Inter", sans-serif;
+    background: #0d1117;
+    color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+  max-width: 900px;
+  margin: 40px auto;
+  background: #161b22;
+  padding: 2rem;
+  border-radius: 20px;
+  color: #fff;
+  font-family: "Inter", sans-serif;
+}
+
+h1 {
+  text-align: center;
+  color: #00b4d8;
+}
+
+.subtitle {
+  text-align: center;
+  color: #aaa;
+  margin-bottom: 2rem;
+}
+
+.tracks-mixer {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #1f2937;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.track span {
+  margin-bottom: 10px;
+  text-transform: capitalize;
+  font-weight: 600;
+}
+
+.track input[type="range"] {
+  width: 40px;
+  height: 150px;
+  writing-mode: bt-lr; /* verticale */
+  -webkit-appearance: slider-vertical;
+  background: #0077b6;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.controls button {
+  padding: 10px 25px;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #00b4d8;
+  border: none;
+  color: #fff;
+  transition: 0.2s;
+}
+
+.controls button:hover {
+  opacity: 0.9;
+}
+
+.download-section {
+  display: flex;
+  justify-content: center;
+}
+
+#download-zip-btn {
+  padding: 10px 30px;
+  font-size: 1rem;
+  background: #0077b6;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#download-zip-btn:hover {
+  opacity: 0.9;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+  .tracks-mixer {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .track input[type="range"] {
+    height: 100px;
+  }
+
+  .controls button, #download-zip-btn {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+  }
+}
+
+.back-section {
+    text-align: center;
+    margin: 15px 0;
+}
+
+.back-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #0077b6;
+    color: #fff;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.back-btn:hover {
+    background-color: #0096c7;
+}

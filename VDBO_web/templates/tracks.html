@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎵 VDBO — Tracce di {{ song_name }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body data-song-name="{{ song_name }}" data-temp-id="{{ temp_id }}">
+  <div class="container">
+    <h1>🎵 {{ song_name }}</h1>
+    <p class="subtitle">Tracce separate</p>
+
+    <div id="player-section">
+      <div class="tracks-mixer">
+        {% for track, url in tracks.items() %}
+        <div class="track">
+          <span>{{ track }}</span>
+          <input type="range" id="vol-{{ track }}" min="0" max="1" step="0.01" value="0.8" orient="vertical" data-url="{{ url }}">
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="controls">
+        <button id="play-btn">▶ Play</button>
+        <button id="stop-btn">⏹ Stop</button>
+      </div>
+
+      <!-- Bottone per tornare alla schermata principale e cancellare i file -->
+      <div class="back-section">
+        <button id="back-btn" class="back-btn">🔙 Torna al caricamento</button>
+      </div>
+
+      <div class="download-section">
+        <button id="download-zip-btn">📥 Scarica ZIP</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+  <script>
+    document.getElementById("back-btn").addEventListener("click", async () => {
+      const songName = document.body.dataset.songName;
+      const tempId = document.body.dataset.tempId;
+
+      try {
+        await axios.post(`/delete/${songName}/${tempId}`);
+      } catch (err) {
+        console.warn("Errore durante la cancellazione:", err);
+      } finally {
+        window.location.href = "/";
+      }
+    });
+  </script>
+</body>
+</html>

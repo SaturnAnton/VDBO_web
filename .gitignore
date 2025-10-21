@@ -22,3 +22,7 @@ Thumbs.db
 
 # Spleeter/Demucs cache
 .cache/
+
+uploads/
+
+output/

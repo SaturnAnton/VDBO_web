@@ -1,107 +1,45 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎵 Demucs Audio Separator</title>
-<style>
-body { font-family:'Segoe UI',sans-serif; background:#f5f7fa; text-align:center; margin:0; padding:0; color:#222; }
-h1 { color:#0078d7; margin-top:30px; }
-.container { max-width:650px; background:white; margin:40px auto; padding:30px; border-radius:15px; box-shadow:0 4px 20px rgba(0,0,0,0.1);}
-input[type="file"], input[type="text"] { width:100%; margin:10px 0; padding:12px; border:1px solid #ccc; border-radius:6px; font-size:15px;}
-button { background:#0078d7; color:white; padding:12px 25px; border:none; border-radius:6px; cursor:pointer; font-size:16px; margin-top:10px; transition:0.3s; }
-button:hover { background:#005ea8; }
-#results { margin-top:25px; text-align:left; }
-.slider-container { display:flex; align-items:center; justify-content:space-between; margin:10px 0;}
-input[type="range"] { width:70%; }
-.hidden { display:none; }
-.error { color:red; font-weight:bold; }
-.loading { margin-top:15px; font-style:italic; color:#555; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎵 VDBO — AI Audio Splitter</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style_main.css') }}">
 </head>
 <body>
+  <div class="container">
+    <h1>🎵 VDBO</h1>
+    <p class="subtitle">Vocals • Drums • Bass • Other — AI Audio Splitter</p>
 
-<h1>🎶 Audio Separator con Demucs</h1>
+    <form id="upload-form" method="POST" action="/process" enctype="multipart/form-data">
+      <label>🎧 Carica un file audio (MP3/WAV):</label>
+      <input type="file" name="file" id="audio-file" accept=".mp3,.wav">
 
-<div class="container">
-<form id="uploadForm" method="post" enctype="multipart/form-data">
-  <label><strong>Carica un file audio (MP3/WAV):</strong></label>
-  <input type="file" name="file" accept=".mp3,.wav">
-  <p><strong>oppure</strong></p>
-  <label><strong>Incolla un URL YouTube:</strong></label>
-  <input type="text" name="url" placeholder="https://www.youtube.com/watch?v=...">
-  <button type="submit">Separa Audio</button>
-  <p id="loadingText" class="loading hidden">⏳ Separazione in corso... attendere alcuni minuti...</p>
-</form>
+      <label>📺 Oppure incolla un link YouTube:</label>
+      <input type="text" name="url" id="youtube-url" placeholder="https://www.youtube.com/watch?v=...">
 
-<div id="results"></div>
-</div>
+      <label>🧠 Seleziona il modello Demucs:</label>
+      <select name="model" id="model-select">
+        <option value="htdemucs" selected>htdemucs (default, veloce)</option>
+        <option value="mdx_extra_q">mdx_extra_q (più preciso, più lento)</option>
+        <option value="mdx">mdx (bilanciato)</option>
+      </select>
 
-<script>
-const form = document.getElementById("uploadForm");
-const resultsDiv = document.getElementById("results");
-const loadingText = document.getElementById("loadingText");
-let tracks = {};
-let playing = false;
+      <button type="submit">🎶 Separa Audio</button>
+    </form>
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  resultsDiv.innerHTML = "";
-  loadingText.classList.remove("hidden");
+    <div id="status" class="loader">⏳ Separazione in corso... Attendere qualche minuto...</div>
+  </div>
 
-  const formData = new FormData(form);
+  <script>
+    // Mostra loader al submit del form
+    const form = document.getElementById("upload-form");
+    const status = document.getElementById("status");
+    status.style.display = "none";
 
-  try {
-    const res = await fetch("/process", { method: "POST", body: formData });
-    const data = await res.json();
-    loadingText.classList.add("hidden");
-
-    if (!data.success) {
-      resultsDiv.innerHTML = `<p class="error">❌ Errore: ${data.error}</p>`;
-      return;
-    }
-
-    tracks = {};
-    resultsDiv.innerHTML = `
-      <h3>✅ Tracce separate:</h3>
-      <button id="playBtn">▶️ Play</button>
-      <div id="sliders"></div>
-    `;
-
-    const slidersDiv = document.getElementById("sliders");
-    for (const [name, url] of Object.entries(data.tracks)) {
-      const audio = new Audio(url);
-      tracks[name] = audio;
-
-      const div = document.createElement("div");
-      div.classList.add("slider-container");
-      div.innerHTML = `<span>${name}</span><input type="range" min="0" max="1" step="0.01" value="1">`;
-      const slider = div.querySelector("input");
-      slider.addEventListener("input", () => { audio.volume = slider.value; });
-      slidersDiv.appendChild(div);
-    }
-
-    // Play/Pause
-    const playBtn = document.getElementById("playBtn");
-    playBtn.addEventListener("click", () => {
-      if (!playing) {
-        for (const a of Object.values(tracks)) a.play();
-        playBtn.textContent = "⏸️ Pausa";
-        playing = true;
-      } else {
-        for (const a of Object.values(tracks)) a.pause();
-        playBtn.textContent = "▶️ Play";
-        playing = false;
-      }
+    form.addEventListener("submit", () => {
+      status.style.display = "block";
     });
-
-  } catch(err) {
-    loadingText.classList.add("hidden");
-    resultsDiv.innerHTML = `<p class="error">❌ Errore nel server</p>`;
-    console.error(err);
-  }
-});
-</script>
-
+  </script>
 </body>
 </html>

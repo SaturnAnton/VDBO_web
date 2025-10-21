@@ -1,83 +1,113 @@
 let audioElements = {};
 let isPlaying = false;
+let currentTime = 0;
+let currentTrackURLs = [];
+
+// Recupera il nome della canzone dal template HTML
+const songName = document.body.dataset.songName;
 
 document.addEventListener("DOMContentLoaded", () => {
-    const uploadForm = document.getElementById("upload-form");
-    const status = document.getElementById("status");
-    const playerSection = document.getElementById("player-section");
     const playBtn = document.getElementById("play-btn");
     const stopBtn = document.getElementById("stop-btn");
+    const downloadBtn = document.getElementById("download-zip-btn");
 
-    uploadForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        status.textContent = "Elaborazione in corso... ⏳ (può durare qualche minuto)";
-        playerSection.classList.add("d-none");
+    // Inizializza audio e slider
+    const trackDivs = document.querySelectorAll(".track");
+    trackDivs.forEach(div => {
+        const track = div.querySelector("span").textContent.toLowerCase();
+        const slider = div.querySelector("input[type='range']");
+        const url = slider.dataset.url || slider.getAttribute("data-url");
 
-        const file = document.getElementById("audio-file").files[0];
-        const url = document.getElementById("youtube-url").value;
+        const audio = new Audio(url);
+        audio.preload = "auto";
+        audio.volume = parseFloat(slider.value);
 
-        const formData = new FormData();
-        if (file) formData.append("file", file);
-        if (url) formData.append("url", url);
+        audio.addEventListener("timeupdate", () => {
+            currentTime = audio.currentTime;
+        });
 
-        try {
-            const res = await axios.post("/process", formData, {
-                headers: { "Content-Type": "multipart/form-data" }
-            });
-            
-            if (res.data.success) {
-                status.textContent = "✅ Tracce pronte!";
-                loadTracks(res.data.tracks);
-                playerSection.classList.remove("d-none");
-            } else {
-                status.textContent = "❌ Errore durante l'elaborazione.";
+        audio.addEventListener("ended", () => {
+            highlightTrack(track, false);
+            // Se tutte le tracce sono finite
+            if (Object.values(audioElements).every(a => a.ended)) {
+                isPlaying = false;
+                playBtn.textContent = "▶ Play";
+                deleteTracks(); // cancella tracce alla fine
             }
-        } catch (err) {
-            console.error(err);
-            status.textContent = "❌ Errore server o file non valido.";
+        });
+
+        audioElements[track] = audio;
+        currentTrackURLs.push(url);
+
+        // Gestione volume slider
+        slider.addEventListener("input", () => {
+            audio.volume = parseFloat(slider.value);
+        });
+    });
+
+    // Play / Pausa
+    playBtn.addEventListener("click", () => {
+        if (!isPlaying) {
+            Object.entries(audioElements).forEach(([track, audio]) => {
+                audio.currentTime = currentTime;
+                audio.play();
+                highlightTrack(track, true);
+            });
+            isPlaying = true;
+            playBtn.textContent = "⏸ Pausa";
+        } else {
+            Object.entries(audioElements).forEach(([track, audio]) => {
+                audio.pause();
+                highlightTrack(track, false);
+            });
+            isPlaying = false;
+            playBtn.textContent = "▶ Play";
         }
     });
 
-    playBtn.addEventListener("click", playAll);
-    stopBtn.addEventListener("click", stopAll);
-
-    // Slider volume
-    ["vocals", "drums", "bass", "other"].forEach(track => {
-        const slider = document.getElementById(`vol-${track}`);
-        slider.addEventListener("input", () => {
-            if (audioElements[track]) {
-                audioElements[track].volume = parseFloat(slider.value);
-            }
+    // Stop → solo pausa senza resettare il tempo
+    stopBtn.addEventListener("click", () => {
+        Object.entries(audioElements).forEach(([track, audio]) => {
+            audio.pause();
+            highlightTrack(track, false);
         });
+        isPlaying = false;
+        playBtn.textContent = "▶ Play";
+    });
+
+    // Download ZIP
+    downloadBtn.addEventListener("click", () => {
+        if (currentTrackURLs.length === 0) return;
+        const zipUrl = "/download_zip?" + new URLSearchParams({
+            tracks: JSON.stringify(currentTrackURLs)
+        });
+        window.location.href = zipUrl;
     });
 });
 
-function loadTracks(tracks) {
-    audioElements = {};
-    ["vocals", "drums", "bass", "other"].forEach(track => {
-        if (tracks[track]) {
-            const audio = new Audio(tracks[track]);
-            audio.volume = 0.8;
-            audioElements[track] = audio;
-        }
-    });
+// Evidenzia traccia
+function highlightTrack(track, highlight) {
+    const slider = document.getElementById(`vol-${track}`);
+    if (!slider) return;
+    if (highlight) {
+        slider.parentElement.style.backgroundColor = "#00b4d8";
+        slider.parentElement.style.color = "#fff";
+    } else {
+        slider.parentElement.style.backgroundColor = "#1f2937";
+        slider.parentElement.style.color = "#fff";
+    }
 }
 
-function playAll() {
-    if (isPlaying) return;
-    const startTime = audioElements.vocals?.currentTime || 0;
-
-    Object.values(audioElements).forEach(a => {
-        a.currentTime = startTime;
-        a.play();
-    });
-    isPlaying = true;
+// Cancella tracce sul server
+async function deleteTracks() {
+    if (!songName) return;
+    try {
+        await fetch(`/delete/${songName}`, { method: "POST" });
+        console.log(`Tracce ${songName} cancellate dal server`);
+    } catch (e) {
+        console.warn("Errore cancellazione tracce:", e);
+    }
 }
 
-function stopAll() {
-    Object.values(audioElements).forEach(a => {
-        a.pause();
-        a.currentTime = 0;
-    });
-    isPlaying = false;
-}
+// Cancella tracce quando l'utente chiude o cambia pagina
+window.addEventListener("beforeunload", deleteTracks);
