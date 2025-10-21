@@ -4,8 +4,8 @@ gunicorn==23.0.0
 
 # Audio processing
 demucs==4.0.1
-torch==2.3.1
-torchaudio==2.3.2
+torch==2.9.0
+torchaudio==2.9.0
 ffmpeg-python==0.2.1
 
 # YouTube download
