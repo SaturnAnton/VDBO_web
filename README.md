@@ -18,6 +18,5 @@ VDBO_web is a web application built with Python and Flask that allows users to p
    python app.py
    ```
 
-## Support
-
+### Support
 For technical issues or questions, please consult the complete video tutorial first. If the problem persists, open an issue in this repository.
