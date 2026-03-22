@@ -22,6 +22,7 @@ os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 logging.basicConfig(level=logging.INFO, format="[%(asctime)s] %(levelname)s - %(message)s")
 logger = logging.getLogger("VDBO")
 
+export_app = app
 # =============================================================================
 # FUNZIONI DI PULIZIA
 # =============================================================================
