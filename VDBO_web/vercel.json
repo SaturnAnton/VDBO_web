@@ -8,6 +8,10 @@
   ],
   "routes": [
     {
+      "src": "/static/(.*)",
+      "dest": "/VDBO_web/static/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "VDBO_web/app.py"
     }

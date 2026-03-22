@@ -11,10 +11,12 @@ from flask import Flask, render_template, request, redirect, url_for, send_from_
 # =============================================================================
 # CONFIGURAZIONE BASE
 # =============================================================================
+import tempfile
+
 app = Flask(__name__)
-UPLOAD_FOLDER = "uploads"
-OUTPUT_FOLDER = "static/output"
-MAX_OUTPUT_FOLDERS = 10
+
+UPLOAD_FOLDER = "/tmp/uploads"
+OUTPUT_FOLDER = "/tmp/static/output"
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
