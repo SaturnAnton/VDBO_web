@@ -11,12 +11,10 @@ from flask import Flask, render_template, request, redirect, url_for, send_from_
 # =============================================================================
 # CONFIGURAZIONE BASE
 # =============================================================================
-import tempfile
-
 app = Flask(__name__)
-
-UPLOAD_FOLDER = "/tmp/uploads"
-OUTPUT_FOLDER = "/tmp/static/output"
+UPLOAD_FOLDER = "uploads"
+OUTPUT_FOLDER = "static/output"
+MAX_OUTPUT_FOLDERS = 10
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
@@ -24,7 +22,6 @@ os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 logging.basicConfig(level=logging.INFO, format="[%(asctime)s] %(levelname)s - %(message)s")
 logger = logging.getLogger("VDBO")
 
-export_app = app
 # =============================================================================
 # FUNZIONI DI PULIZIA
 # =============================================================================
